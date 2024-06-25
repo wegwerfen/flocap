@@ -1,0 +1,7 @@
+flask
+numpy==1.26.4
+transformers
+pillow
+torch
+einops
+timm

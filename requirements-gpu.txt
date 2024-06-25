@@ -1,0 +1,10 @@
+flask
+numpy==1.26.4
+transformers
+pillow
+einops
+timm
+--find-links https://download.pytorch.org/whl/cu118
+torch==2.3.1+cu118
+torchvision==0.18.1+cu118
+torchaudio==2.3.1+cu118
