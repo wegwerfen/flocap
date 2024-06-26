@@ -86,6 +86,48 @@ def generate_caption(image):
     
     return parsed_answer
 
+@app.route('/api/modules', methods=['GET'])
+def extras_modules():
+    return jsonify({"modules": ["caption"]})
+
+@app.route('/api/caption', methods=['POST'])
+def extras_caption():
+    logger.info("Received request: %s %s", request.method, request.url)
+    logger.debug("Request headers: %s", request.headers)
+
+    data = request.json
+    logger.debug("Request data: %s", data)
+    
+    if 'image' not in data:
+        logger.error("Invalid request format: 'image' field is missing")
+        return jsonify({"error": "Invalid request format"}), 400
+
+    image = None
+
+    try:
+        image_data = str(data['image'])
+        image_data = image_data.split(',')[1] if image_data.startswith('data:image') else image_data
+        image_bytes = base64.b64decode(image_data)
+        image = Image.open(io.BytesIO(image_bytes))
+    except Exception as e:
+        logger.error("Error decoding base64 image: %s", str(e))
+        return jsonify({"error": f"Error processing image: {str(e)}"}), 400
+
+    try:
+        start_time = time.time()
+        caption_result = generate_caption(image)
+        end_time = time.time()
+        elapsed_time = end_time - start_time
+        logger.info("Inference Time: %s", elapsed_time)
+        logger.debug("Caption result: %s", caption_result)
+        logger.debug("type: %s", type(caption_result))
+        caption = str(caption_result)
+        
+        return jsonify({"caption": caption})
+    except Exception as e:
+        logger.error("Error generating caption: %s", str(e))
+        return jsonify({"error": f"Error generating caption: {str(e)}"}), 500
+
 @app.route('/chat/completions', methods=['POST'])
 def chat_completions():
     logger.info("Received request: %s %s", request.method, request.url)
