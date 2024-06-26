@@ -183,6 +183,20 @@ After starting the application, you can send POST requests to `http://localhost:
 
 Detailed API documentation and example requests will be provided in a separate document.
 
+## Command-line Arguments
+
+```txt
+usage: flocap.py [-h] [--port PORT] [--listen] [--debug]
+
+Florence-2 Captioning API
+
+options:
+  -h, --help   show this help message and exit
+  --port PORT  Specify the port on which the application is hosted
+  --listen     Host the app on the local network
+  --debug      Enable debug mode for the Flask app
+```
+
 ## Contributing
 
 Contributions to the Florence 2 API App are welcome. Please feel free to submit pull requests or create issues for bugs and feature requests.

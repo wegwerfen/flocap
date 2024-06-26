@@ -1,6 +1,7 @@
 import sys
 import os
 import time
+import argparse
 import torch
 from flask import Flask, request, jsonify
 from flask_cors import CORS
@@ -40,6 +41,25 @@ def fixed_get_imports(filename: str | os.PathLike) -> list[str]:
 
 app = Flask(__name__)
 CORS(app)
+
+parser = argparse.ArgumentParser(
+    prog="flocap.py", description="Florence-2 Captioning API"
+)
+parser.add_argument(
+    "--port", type=int, help="Specify the port on which the application is hosted"
+)
+parser.add_argument(
+    "--listen", action="store_true", help="Host the app on the local network"
+)
+parser.add_argument(
+    "--debug", action="store_true", help="Enable debug mode for the Flask app"
+)
+
+args = parser.parse_args()
+host = "0.0.0.0" if args.listen else "127.0.0.1"
+port = int(args.port) if args.port else 5000
+debug = bool(args.debug) if args.debug else False
+
 # logging.basicConfig(level=logging.DEBUG)
 
 # Enhanced GPU detection and information
@@ -213,4 +233,4 @@ def chat_completions():
     return jsonify(response)
 
 if __name__ == '__main__':
-    app.run(debug=True,host="0.0.0.0")
+    app.run(debug=debug, host=host, port=port)
