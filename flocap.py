@@ -110,7 +110,7 @@ def extras_caption():
         image_data = str(data['image'])
         image_data = image_data.split(',')[1] if image_data.startswith('data:image') else image_data
         image_bytes = base64.b64decode(image_data)
-        image = Image.open(io.BytesIO(image_bytes))
+        image = Image.open(io.BytesIO(image_bytes)).convert("RGB")
     except Exception as e:
         logger.error("Error decoding base64 image: %s", str(e))
         return jsonify({"error": f"Error processing image: {str(e)}"}), 400
@@ -159,7 +159,7 @@ def chat_completions():
                         try:
                             image_data = image_data.split(',')[1]
                             image_bytes = base64.b64decode(image_data)
-                            image = Image.open(io.BytesIO(image_bytes))
+                            image = Image.open(io.BytesIO(image_bytes)).convert("RGB")
                         except Exception as e:
                             logger.error("Error decoding base64 image: %s", str(e))
                             return jsonify({"error": f"Error processing image: {str(e)}"}), 400
