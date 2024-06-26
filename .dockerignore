@@ -1,0 +1,5 @@
+# .dockerignore
+DOCKERFILE
+images
+README.md
+LICENSE
