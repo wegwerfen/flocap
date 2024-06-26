@@ -1,14 +1,34 @@
+import sys
+import os
+import time
+import torch
 from flask import Flask, request, jsonify
 from transformers import AutoProcessor, AutoModelForCausalLM
 from PIL import Image
-import os
 import io
-import torch
 import logging
 import base64
-import json
 from unittest.mock import patch
 from transformers.dynamic_module_utils import get_imports
+from transformers.utils import TRANSFORMERS_CACHE
+logger = logging.getLogger(__name__)
+logging.basicConfig(format='%(asctime)s %(levelname)s:%(message)s', datefmt='%m/%d/%Y %I:%M:%S %p', level=logging.INFO)
+
+logger.debug(TRANSFORMERS_CACHE)
+
+logger.debug("Python executable: %s", sys.executable)
+logger.debug("Python version: %s", sys.version)
+logger.debug("Working directory: %s", os.getcwd())
+logger.debug("PYTHONPATH: %s", os.environ.get('PYTHONPATH', 'Not set'))
+
+logger.debug("PyTorch version: %s", torch.__version__)
+logger.debug("PyTorch installation location: %s", torch.__file__)
+logger.debug("CUDA available: %s", torch.cuda.is_available())
+logger.debug("CUDA version: %s", torch.version.cuda if torch.cuda.is_available() else "N/A")
+if torch.cuda.is_available():
+    logger.debug("CUDA device count: %s", torch.cuda.device_count())
+    logger.debug("CUDA device name: %s", torch.cuda.get_device_name(0))
+
 
 def fixed_get_imports(filename: str | os.PathLike) -> list[str]:
     if not str(filename).endswith("modeling_florence2.py"):
@@ -17,20 +37,35 @@ def fixed_get_imports(filename: str | os.PathLike) -> list[str]:
     imports.remove("flash_attn")
     return imports
 
-
 app = Flask(__name__)
-logging.basicConfig(level=logging.DEBUG)
+# logging.basicConfig(level=logging.DEBUG)
+
+# Enhanced GPU detection and information
+# print("PyTorch version:", torch.__version__)
+# print("CUDA available:", torch.cuda.is_available())
+# print("CUDA version:", torch.version.cuda if torch.cuda.is_available() else "N/A")
+# if torch.cuda.is_available():
+#     print("CUDA device count:", torch.cuda.device_count())
+#     print("CUDA device name:", torch.cuda.get_device_name(0))
+
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+print(f"Using device: {device}")
 
 # Load the model and processor
 model_id = 'microsoft/Florence-2-large'
-with patch("transformers.dynamic_module_utils.get_imports", fixed_get_imports): #workaround for unnecessary flash_attn requirement
-            model = AutoModelForCausalLM.from_pretrained(model_id, attn_implementation="sdpa",trust_remote_code=True)
-# model = AutoModelForCausalLM.from_pretrained(model_id, trust_remote_code=True).eval()
+with patch("transformers.dynamic_module_utils.get_imports", fixed_get_imports):
+    model = AutoModelForCausalLM.from_pretrained(model_id, attn_implementation="sdpa", trust_remote_code=True)
+    model = model.to(device)
+model.eval()  # Set the model to evaluation mode
 processor = AutoProcessor.from_pretrained(model_id, trust_remote_code=True)
+
+logger.debug("Model device: %s", {next(model.parameters()).device})
 
 def generate_caption(image):
     task_prompt = '<MORE_DETAILED_CAPTION>'
     inputs = processor(text=task_prompt, images=image, return_tensors="pt")
+    # Move inputs to the same device as the model
+    inputs = {k: v.to(device) for k, v in inputs.items()}
     
     with torch.no_grad():
         generated_ids = model.generate(
@@ -53,14 +88,14 @@ def generate_caption(image):
 
 @app.route('/chat/completions', methods=['POST'])
 def chat_completions():
-    app.logger.info(f"Received request: {request.method} {request.url}")
-    app.logger.debug(f"Request headers: {request.headers}")
+    logger.info("Received request: %s %s", request.method, request.url)
+    logger.debug("Request headers: %s", request.headers)
 
     data = request.json
-    app.logger.debug(f"Request data: {data}")
+    logger.debug("Request data: %s", data)
 
     if 'messages' not in data or not isinstance(data['messages'], list):
-        app.logger.error("Invalid request format: 'messages' field is missing or not a list")
+        logger.error("Invalid request format: 'messages' field is missing or not a list")
         return jsonify({"error": "Invalid request format"}), 400
 
     image = None
@@ -79,17 +114,21 @@ def chat_completions():
                             image_bytes = base64.b64decode(image_data)
                             image = Image.open(io.BytesIO(image_bytes))
                         except Exception as e:
-                            app.logger.error(f"Error decoding base64 image: {str(e)}")
+                            logger.error("Error decoding base64 image: %s", str(e))
                             return jsonify({"error": f"Error processing image: {str(e)}"}), 400
 
     if image is None:
-        app.logger.error("No valid image found in request")
+        logger.error("No valid image found in request")
         return jsonify({"error": "No valid image found in request"}), 400
 
     try:
+        start_time = time.time()
         caption_result = generate_caption(image)
-        app.logger.debug(f"Caption result: {caption_result}")
-        app.logger.debug(f"type: {type(caption_result)}")
+        end_time = time.time()
+        elapsed_time = end_time - start_time
+        logger.info("Inference Time: %s", elapsed_time)
+        logger.debug("Caption result: %s", caption_result)
+        logger.debug("type: %s", type(caption_result))
         if isinstance(caption_result, dict):
             caption = caption_result.get('<MORE_DETAILED_CAPTION>', 'No caption generated')
         else:
@@ -98,7 +137,7 @@ def chat_completions():
         # Combine the user's prompt with the generated caption
         full_response = f"User asked: {user_prompt}\n\nImage description: {caption}"
     except Exception as e:
-        app.logger.error(f"Error generating caption: {str(e)}")
+        logger.error("Error generating caption: %s", str(e))
         return jsonify({"error": f"Error generating caption: {str(e)}"}), 500
     
     response = {
@@ -123,7 +162,7 @@ def chat_completions():
         ]
     }
     
-    app.logger.info("Successfully generated caption")
+    logger.info("Successfully generated caption")
     return jsonify(response)
 
 if __name__ == '__main__':
