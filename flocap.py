@@ -58,7 +58,14 @@ parser.add_argument(
 args = parser.parse_args()
 host = "0.0.0.0" if args.listen else "127.0.0.1"
 port = int(args.port) if args.port else 5000
-debug = bool(args.debug) if args.debug else False
+# debug = bool(args.debug) if args.debug else False
+
+if os.getenv("DOCKER") == "TRUE":
+    #running in a docker container - ENV set in Dockerfile
+    debug = bool(os.getenv("DEBUG")) if os.getenv("DEBUG") else False
+else:
+    # Not running in Docker. Use arg if included.
+    debug = bool(args.debug) if args.debug else False
 
 # logging.basicConfig(level=logging.DEBUG)
 
