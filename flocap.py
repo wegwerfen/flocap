@@ -3,6 +3,7 @@ import os
 import time
 import torch
 from flask import Flask, request, jsonify
+from flask_cors import CORS
 from transformers import AutoProcessor, AutoModelForCausalLM
 from PIL import Image
 import io
@@ -38,6 +39,7 @@ def fixed_get_imports(filename: str | os.PathLike) -> list[str]:
     return imports
 
 app = Flask(__name__)
+CORS(app)
 # logging.basicConfig(level=logging.DEBUG)
 
 # Enhanced GPU detection and information
@@ -121,7 +123,11 @@ def extras_caption():
         logger.info("Inference Time: %s", elapsed_time)
         logger.debug("Caption result: %s", caption_result)
         logger.debug("type: %s", type(caption_result))
-        caption = str(caption_result)
+        logger.debug("type: %s", type(caption_result))
+        if isinstance(caption_result, dict):
+            caption = caption_result.get('<MORE_DETAILED_CAPTION>', 'No caption generated')
+        else:
+            caption = str(caption_result)
         
         return jsonify({"caption": caption})
     except Exception as e:
