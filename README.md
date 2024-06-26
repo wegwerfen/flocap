@@ -36,9 +36,10 @@ Given these factors, using the CPU version offers more flexibility in terms of P
 
 ### Windows
 
-1. **CPU** Ensure you have Python 3.10 or later installed on your system.
+1. 
+- **CPU** Ensure you have Python 3.10 or later installed on your system.
 or
-1. **GPU** Ensure you have Python 3.10 installed or will have a virtual environment with Python 3.10 installed.
+- **GPU** Ensure you have Python 3.10 installed or will have a virtual environment with Python 3.10 installed.
 
 2. Clone this repository:
    ```
@@ -52,12 +53,13 @@ or
    venv\Scripts\activate
    ```
 
-4. **CPU** Install the required packages:
+4. 
+- **CPU** Install the required packages:
    ```
    pip install -r requirements.txt
    ```
 or
-4. **GPU** Install the required packages:
+- **GPU** Install the required packages:
    ```
    pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
    pip install -r requirements.txt
@@ -69,9 +71,10 @@ or
 
 ### Linux/WSL
 
-1. **CPU** Ensure you have Python 3.10 or later installed on your system.
+1. 
+- **CPU** Ensure you have Python 3.10 or later installed on your system.
 or
-1. **GPU** Ensure you have Python 3.10 installed or will have a virtual environment with Python 3.10 installed.
+- **GPU** Ensure you have Python 3.10 installed or will have a virtual environment with Python 3.10 installed.
 
 2. Clone this repository:
    ```
@@ -85,12 +88,13 @@ or
    venv\Scripts\activate
    ```
 
-4. **CPU** Install the required packages:
+4. 
+- **CPU** Install the required packages:
    ```
    pip install -r requirements.txt
    ```
 or
-4. **GPU** Install the required packages:
+- **GPU** Install the required packages:
    ```
    pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
    pip install -r requirements.txt
