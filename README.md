@@ -152,7 +152,7 @@ environment:
 **Docker Compose**
 Run the appropriate docker-compose.yml file using:
 ```
-docker compose up -d -f docker-compose-cpu.yml
+docker compose -f docker-compose-cpu.yml up -d 
 ```
 
 ## SillyTavern Usage
