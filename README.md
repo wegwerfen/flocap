@@ -140,6 +140,15 @@ You may specify a specific GPU or multiple GPUs with:
 --gpus device=0,2
 ```
 
+**Debug**
+Debug logging can be activated by adding the Environment variable DEBUG=TRUE
+```
+-e DEBUG=TRUE
+
+environment:
+  - DEBUG=TRUE
+```
+
 **Docker Compose**
 Run the appropriate docker-compose.yml file using:
 ```
