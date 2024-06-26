@@ -114,7 +114,7 @@ Docker installation instructions are coming soon. This section will be updated w
 
 ## SillyTavern Usage
 
-### As SillyTavern Extras endpoint
+### As a SillyTavern Extras endpoint
 
 1. In **Extensions** (the 3 blocks icon) check for **Image Captioning**. If it is not there click on **Manage Extensions** at the top right and then check **Image Captioning**, then close.
 
@@ -128,15 +128,15 @@ Docker installation instructions are coming soon. This section will be updated w
 
 3. Click **Connect** and verify that the status changes from "Not connected..." to "Connected!".
 
-4. Open the **Image Captioning** settings (click down arrow to the right).
+4. Open the **Image Captioning** settings (click the down arrow to the right).
 
    **Source** = Extras
 
-5. In a chat click on the **Extras Extensions** icon (the wand) in the bottem left. Select **Generate Caption**. Select image. Character will not respond to the image until you click the arrow either with or without a prompt from you.
+5. In a chat click on the **Extras Extensions** icon (the wand) in the bottom left. Select **Generate Caption**. Select image. The character will not respond to the image until you click the arrow either with or without a prompt from you.
 
 ![Extras Configuration](images/extras.png)
 
-### As Custom OpenAI endpoint
+### As a Custom OpenAI endpoint
 
 1. In **Extensions** (the 3 blocks icon) check for **Image Captioning**. If it is not there click on **Manage Extensions** at the top right and then check **Image Captioning**, then close.
 
