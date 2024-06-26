@@ -123,7 +123,6 @@ def extras_caption():
         logger.info("Inference Time: %s", elapsed_time)
         logger.debug("Caption result: %s", caption_result)
         logger.debug("type: %s", type(caption_result))
-        logger.debug("type: %s", type(caption_result))
         if isinstance(caption_result, dict):
             caption = caption_result.get('<MORE_DETAILED_CAPTION>', 'No caption generated')
         else:
