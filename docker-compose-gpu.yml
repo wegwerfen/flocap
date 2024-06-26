@@ -1,0 +1,13 @@
+version: '3'
+services:
+  flocap:
+    image: ghcr.io/wegwerfen/flocap:gpu
+    container_name: flocap
+    ports:
+      - "5000:5000"
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - capabilities: [gpu]
+              device_ids: ['0']

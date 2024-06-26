@@ -110,7 +110,50 @@ or
 
 ### Docker
 
-Docker installation instructions are coming soon. This section will be updated when Docker support is implemented.
+**GPU Support**:
+
+As noted previously, I recommend running the model on the CPU instead of the GPU. That being said I will provide Docker images for both CPU and GPU inference.
+
+Although, with proper configuration, the GPU docker image should work on Linux, I will not provide detailed documentation on running it on Linux.
+
+**Windows GPU Requirements** - Only for running the GPU image.
+
+- An NVIDIA GPU
+- Up to date Windows 10 or 11
+- Up to date drivers from NVIDIA supporting WSL 2 GPU Paravirtualization - The standard Game Ready drivers should normally work.
+- Docker Desktop
+- The latest version of the WSL 2 Linux kernel.
+- Make sure WSL2 backend is turned on in Docker Desktop
+
+**Docker Run - CPU**
+```
+docker run --name flocap -p 5000:5000 ghcr.io/wegwerfen/flocap:cpu
+```
+
+**Docker Run - GPU**
+```
+docker run --name flocap -p 5000:5000 --gpus all ghcr.io/wegwerfen/flocap:gpu
+```
+You may specify a specific GPU or multiple GPUs with:
+```
+--gpus device=0
+--gpus device=0,2
+```
+
+**Debug**
+Debug logging can be activated by adding the Environment variable DEBUG=TRUE
+```
+-e DEBUG=TRUE
+
+environment:
+  - DEBUG=TRUE
+```
+
+**Docker Compose**
+Run the appropriate docker-compose.yml file using:
+```
+docker compose up -d -f docker-compose-cpu.yml
+```
 
 ## SillyTavern Usage
 

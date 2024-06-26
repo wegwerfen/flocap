@@ -13,8 +13,38 @@ import base64
 from unittest.mock import patch
 from transformers.dynamic_module_utils import get_imports
 from transformers.utils import TRANSFORMERS_CACHE
+
+parser = argparse.ArgumentParser(
+    prog="flocap.py", description="Florence-2 Captioning API"
+)
+parser.add_argument(
+    "--port", type=int, help="Specify the port on which the application is hosted"
+)
+parser.add_argument(
+    "--listen", action="store_true", help="Host the app on the local network"
+)
+parser.add_argument(
+    "--debug", action="store_true", help="Enable debug mode for the Flask app"
+)
+
+args = parser.parse_args()
+host = "0.0.0.0" if args.listen else "127.0.0.1"
+port = int(args.port) if args.port else 5000
+# debug = bool(args.debug) if args.debug else False
+
+if os.getenv("DOCKER") == "TRUE":
+    #running in a docker container - ENV set in Dockerfile
+    debug = bool(os.getenv("DEBUG")) if os.getenv("DEBUG") else False
+else:
+    # Not running in Docker. Use arg if included.
+    debug = bool(args.debug) if args.debug else False
+print(f"Debug: {debug}")
+
+log_level = "DEBUG" if debug else "INFO"
+print(f"Log Level: {log_level}")
+
 logger = logging.getLogger(__name__)
-logging.basicConfig(format='%(asctime)s %(levelname)s:%(message)s', datefmt='%m/%d/%Y %I:%M:%S %p', level=logging.INFO)
+logging.basicConfig(format='%(asctime)s %(levelname)s:%(message)s', datefmt='%m/%d/%Y %I:%M:%S %p', level=log_level)
 
 logger.debug(TRANSFORMERS_CACHE)
 
@@ -42,24 +72,31 @@ def fixed_get_imports(filename: str | os.PathLike) -> list[str]:
 app = Flask(__name__)
 CORS(app)
 
-parser = argparse.ArgumentParser(
-    prog="flocap.py", description="Florence-2 Captioning API"
-)
-parser.add_argument(
-    "--port", type=int, help="Specify the port on which the application is hosted"
-)
-parser.add_argument(
-    "--listen", action="store_true", help="Host the app on the local network"
-)
-parser.add_argument(
-    "--debug", action="store_true", help="Enable debug mode for the Flask app"
-)
+# parser = argparse.ArgumentParser(
+#     prog="flocap.py", description="Florence-2 Captioning API"
+# )
+# parser.add_argument(
+#     "--port", type=int, help="Specify the port on which the application is hosted"
+# )
+# parser.add_argument(
+#     "--listen", action="store_true", help="Host the app on the local network"
+# )
+# parser.add_argument(
+#     "--debug", action="store_true", help="Enable debug mode for the Flask app"
+# )
 
-args = parser.parse_args()
-host = "0.0.0.0" if args.listen else "127.0.0.1"
-port = int(args.port) if args.port else 5000
-debug = bool(args.debug) if args.debug else False
+# args = parser.parse_args()
+# host = "0.0.0.0" if args.listen else "127.0.0.1"
+# port = int(args.port) if args.port else 5000
+# # debug = bool(args.debug) if args.debug else False
 
+# if os.getenv("DOCKER") == "TRUE":
+#     #running in a docker container - ENV set in Dockerfile
+#     debug = bool(os.getenv("DEBUG")) if os.getenv("DEBUG") else False
+# else:
+#     # Not running in Docker. Use arg if included.
+#     debug = bool(args.debug) if args.debug else False
+# print(f"Debug: {debug}")
 # logging.basicConfig(level=logging.DEBUG)
 
 # Enhanced GPU detection and information
